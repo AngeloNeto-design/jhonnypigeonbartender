@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jhonny Pigeon · Bartender de Alto Padrão | Península de Maraú, Barra Grande e Camamu</title>
+  <meta name="description" content="Coquetelaria autoral de alto padrão para casamentos, eventos privados e corporativos na Península de Maraú, Barra Grande e Camamu (BA). Simule seu evento e fale direto no WhatsApp.">
+  <meta name="keywords" content="bartender para eventos Maraú, bartender casamento Barra Grande, open bar Camamu, coquetelaria Península de Maraú, bartender Bahia">
+  <meta property="og:title" content="Jhonny Pigeon · Coquetelaria autoral na Península de Maraú">
+  <meta property="og:description" content="Curtiu o drink? Leve essa experiência para a sua festa. Eventos privados, casamentos e corporativos em Maraú, Barra Grande e Camamu.">
+  <meta property="og:image" content="./assets/images/hero-bartender.jpg">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+  <!-- ===== HERO ===== -->
+  <header class="hero" id="topo">
+    <div class="hero__media">
+      <img src="./assets/images/hero-bartender.jpg" alt="Jhonny Pigeon finalizando um drink autoral no balcão" class="hero__img" fetchpriority="high">
+      <div class="hero__overlay"></div>
+    </div>
+    <div class="hero__content container">
+      <p class="hero__kicker">Você acabou de ver ao vivo</p>
+      <h1 class="hero__title">Curtiu o drink?<br>Leve essa experiência para a sua festa.</h1>
+      <p class="hero__subtitle">Coquetelaria autoral de alto padrão na Península de Maraú.<br class="only-desktop"> Bartender de referência em Barra Grande e Camamu.</p>
+      <div class="hero__ctas">
+        <a href="#calculadora" class="btn btn--primary" data-scroll>Simular meu evento</a>
+        <a href="#" class="btn btn--ghost" id="hero-whatsapp" target="_blank" rel="noopener">Falar no WhatsApp</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== MODALIDADES ===== -->
+    <section class="section" id="servicos">
+      <div class="container">
+        <h2 class="section__title">Como posso servir o seu evento</h2>
+        <div class="cards">
+          <article class="card">
+            <div class="card__icon" aria-hidden="true">🍸</div>
+            <h3 class="card__title">Eventos Privados &amp; Open Bar Premium</h3>
+            <p class="card__text">Casamentos, aniversários e festas em casas de temporada. Bar completo, equipe e drinks autorais desenhados para o seu evento — do brinde ao último gole.</p>
+          </article>
+          <article class="card">
+            <div class="card__icon" aria-hidden="true">📋</div>
+            <h3 class="card__title">Consultoria para Bares &amp; Restaurantes</h3>
+            <p class="card__text">Criação de carta de drinks, treinamento de equipe e padronização de serviço para elevar a experiência de bar do seu estabelecimento.</p>
+          </article>
+          <article class="card">
+            <div class="card__icon" aria-hidden="true">✨</div>
+            <h3 class="card__title">Masterclasses &amp; Experiências para Marcas</h3>
+            <p class="card__text">Aulas de coquetelaria, ativações de marca e experiências sensoriais para grupos, retiros e eventos corporativos.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GALERIA ===== -->
+    <section class="section section--flush" id="galeria">
+      <div class="container">
+        <h2 class="section__title">Um gosto do que espera os seus convidados</h2>
+      </div>
+      <div class="gallery">
+        <figure class="gallery__item">
+          <img src="./assets/images/drink-1.jpg" alt="Drink autoral verde com espuma e hortelã, praia ao fundo" loading="lazy">
+        </figure>
+        <figure class="gallery__item">
+          <img src="./assets/images/bar-movel.jpg" alt="Balcão de bar rústico em madeira à beira-mar com seleção de destilados" loading="lazy">
+        </figure>
+        <figure class="gallery__item">
+          <img src="./assets/images/experiencia-1.jpg" alt="Jhonny Pigeon atrás do balcão pronto para servir" loading="lazy">
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===== FAIXA DE ATENDIMENTO ===== -->
+    <section class="band">
+      <div class="container">
+        <p class="band__text">Atendimento a partir de <strong>R$&nbsp;3.500</strong> · agenda limitada por temporada</p>
+      </div>
+    </section>
+
+    <!-- ===== CALCULADORA ===== -->
+    <section class="section" id="calculadora">
+      <div class="container container--narrow">
+        <h2 class="section__title">Simule o seu evento</h2>
+        <p class="section__lead">Em menos de 1 minuto você tem uma faixa de investimento e já abre a conversa com a data reservada na fila.</p>
+
+        <form class="calc" id="calc-form" novalidate>
+          <!-- Progresso -->
+          <ol class="calc__steps" aria-hidden="true">
+            <li class="calc__step-dot is-active" data-dot="1">1</li>
+            <li class="calc__step-dot" data-dot="2">2</li>
+            <li class="calc__step-dot" data-dot="3">3</li>
+          </ol>
+
+          <!-- PASSO 1: o evento -->
+          <fieldset class="calc__panel is-active" data-step="1">
+            <legend class="calc__legend">Sobre o evento</legend>
+
+            <label class="field">
+              <span class="field__label">Tipo de evento</span>
+              <select class="field__input" id="f-event-type" required>
+                <option value="Casamento">Casamento</option>
+                <option value="Aniversário">Aniversário</option>
+                <option value="Evento corporativo">Evento corporativo</option>
+                <option value="Festa privada">Festa privada</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span class="field__label">Número de convidados</span>
+              <input class="field__input" id="f-guests" type="number" inputmode="numeric" min="1" max="2000" placeholder="Ex.: 80" required>
+              <span class="field__error" id="err-guests" hidden>Informe um número de convidados válido.</span>
+            </label>
+
+            <label class="field">
+              <span class="field__label">Duração do evento (horas)</span>
+              <input class="field__input" id="f-duration" type="number" inputmode="numeric" min="2" max="12" value="4">
+              <span class="field__hint">4h inclusas no padrão · horas extras entram no cálculo</span>
+            </label>
+
+            <div class="calc__nav">
+              <button type="button" class="btn btn--primary calc__next" data-next="2">Continuar</button>
+            </div>
+          </fieldset>
+
+          <!-- PASSO 2: o serviço -->
+          <fieldset class="calc__panel" data-step="2">
+            <legend class="calc__legend">Formato do serviço</legend>
+
+            <div class="choice-group" role="radiogroup" aria-label="Modelo de contratação">
+              <label class="choice">
+                <input type="radio" name="service-model" value="full" checked>
+                <span class="choice__body">
+                  <span class="choice__title">Serviço completo</span>
+                  <span class="choice__desc">Equipe, bar, insumos e <strong>bebidas inclusas</strong>. Você não se preocupa com nada.</span>
+                </span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="service-model" value="labor">
+                <span class="choice__body">
+                  <span class="choice__title">Equipe + insumos</span>
+                  <span class="choice__desc">Você fornece as bebidas; eu levo equipe, técnica e insumos.</span>
+                </span>
+              </label>
+            </div>
+
+            <div class="choice-group" id="package-group" role="radiogroup" aria-label="Pacote de drinks">
+              <p class="field__label">Estilo da carta de drinks</p>
+              <label class="choice">
+                <input type="radio" name="package" value="CLASSIC">
+                <span class="choice__body">
+                  <span class="choice__title">Clássicos Autorais</span>
+                  <span class="choice__desc">Caipirinhas de autor, clássicos bem executados e frutas da região.</span>
+                </span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="package" value="PREMIUM" checked>
+                <span class="choice__body">
+                  <span class="choice__title">Gin Bar &amp; Internacionais</span>
+                  <span class="choice__desc">Gin tônicas especiais, spritz e coquetéis internacionais com rótulos premium.</span>
+                </span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="package" value="HIGH_END">
+                <span class="choice__body">
+                  <span class="choice__title">Coquetelaria de Autor</span>
+                  <span class="choice__desc">Carta exclusiva criada para o seu evento, técnicas de bar de alta gastronomia.</span>
+                </span>
+              </label>
+            </div>
+
+            <label class="choice choice--toggle">
+              <input type="checkbox" id="f-mobile-bar">
+              <span class="choice__body">
+                <span class="choice__title">Estrutura de bar móvel + logística da península</span>
+                <span class="choice__desc">Acesso por barco/4x4 até o local do evento (Maraú, Barra Grande, Camamu e região).</span>
+              </span>
+            </label>
+
+            <div class="calc__nav">
+              <button type="button" class="btn btn--ghost calc__back" data-back="1">Voltar</button>
+              <button type="button" class="btn btn--primary calc__next" data-next="3">Ver estimativa</button>
+            </div>
+          </fieldset>
+
+          <!-- PASSO 3: estimativa + contato -->
+          <fieldset class="calc__panel" data-step="3">
+            <legend class="calc__legend">Sua estimativa</legend>
+
+            <div class="estimate" id="estimate-box" aria-live="polite">
+              <p class="estimate__label">Faixa de investimento estimada</p>
+              <p class="estimate__value" id="estimate-value">—</p>
+              <p class="estimate__meta" id="estimate-meta"></p>
+              <p class="estimate__disclaimer">Valor final depende da data, local exato e carta escolhida — a proposta fechada chega no WhatsApp.</p>
+            </div>
+
+            <label class="field">
+              <span class="field__label">Seu nome</span>
+              <input class="field__input" id="f-name" type="text" autocomplete="name" placeholder="Como posso te chamar?" required>
+              <span class="field__error" id="err-name" hidden>Me diga seu nome para eu te responder direitinho.</span>
+            </label>
+
+            <label class="field">
+              <span class="field__label">Data pretendida</span>
+              <input class="field__input" id="f-date" type="date">
+              <span class="field__hint">Ainda não tem data? Pode deixar em branco.</span>
+            </label>
+
+            <div class="calc__nav">
+              <button type="button" class="btn btn--ghost calc__back" data-back="2">Voltar</button>
+              <button type="submit" class="btn btn--whatsapp" id="btn-send">
+                Verificar disponibilidade no WhatsApp
+              </button>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===== AUTORIDADE / TRAJETÓRIA ===== -->
+    <section class="section section--alt" id="trajetoria">
+      <div class="container container--narrow">
+        <h2 class="section__title">Trajetória</h2>
+        <p class="section__lead">Anos de balcão nos endereços mais desejados da península.</p>
+        <ul class="timeline">
+          <li class="timeline__item"><span class="timeline__place">Vivant Eco Resort</span><span class="timeline__role">Atuação à frente do bar</span></li>
+          <li class="timeline__item"><span class="timeline__place">Amar Beach Club</span><span class="timeline__role">Atuação à frente do bar</span></li>
+          <li class="timeline__item"><span class="timeline__place">Bizz Cozinha Europeia</span><span class="timeline__role">Atuação à frente do bar</span></li>
+          <li class="timeline__item timeline__item--current"><span class="timeline__place">Pontal do Carapitangui</span><span class="timeline__role">Atualmente à frente do bar</span></li>
+        </ul>
+        <div class="cert">
+          <span class="cert__badge" aria-hidden="true">🎓</span>
+          <p class="cert__text">Formação profissional pela <strong>Escola de Bartender Maria Bento</strong></p>
+        </div>
+        <!--
+          DEPOIMENTOS: adicionar aqui apenas avaliações REAIS de clientes quando disponíveis.
+          Não publicar depoimentos inventados (regra do brief, seção 3.6).
+        -->
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container footer__grid">
+      <div>
+        <p class="footer__brand">Jhonny Pigeon</p>
+        <p class="footer__tag">Coquetelaria autoral · Península de Maraú, Barra Grande e Camamu — BA</p>
+      </div>
+      <div class="footer__links">
+        <a href="https://instagram.com/jhonnypigeonbartender" target="_blank" rel="noopener" class="footer__link">Instagram @jhonnypigeonbartender</a>
+        <a href="#" id="footer-whatsapp" target="_blank" rel="noopener" class="footer__link">WhatsApp (71) 99646-7164</a>
+      </div>
+    </div>
+    <p class="footer__copy">© <span id="year"></span> Jhonny Pigeon · Todos os direitos reservados</p>
+  </footer>
+
+  <!-- ===== WHATSAPP FLUTUANTE (sempre visível, independente da calculadora) ===== -->
+  <a href="#" id="float-whatsapp" class="float-whatsapp" target="_blank" rel="noopener" aria-label="Falar no WhatsApp agora">
+    <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true" fill="currentColor">
+      <path d="M16 2.7C8.7 2.7 2.7 8.6 2.7 16c0 2.5.7 4.8 1.9 6.9L2.7 29.3l6.6-1.8c2 1.1 4.3 1.7 6.7 1.7 7.3 0 13.3-5.9 13.3-13.2S23.3 2.7 16 2.7zm0 24.1c-2.2 0-4.2-.6-6-1.7l-.4-.3-3.9 1.1 1.1-3.8-.3-.4a10.8 10.8 0 0 1-1.7-5.7c0-6 4.9-10.9 11.2-10.9 6 0 10.9 4.9 10.9 10.9s-4.9 10.8-10.9 10.8zm6-8.1c-.3-.2-1.9-1-2.2-1.1-.3-.1-.5-.2-.7.2-.2.3-.8 1.1-1 1.3-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.3-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.3.3-.6.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.7s1.2 3.2 1.3 3.4c.2.2 2.3 3.5 5.5 4.9.8.3 1.4.5 1.8.7.8.2 1.5.2 2 .1.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5l-.6-.4z"/>
+    </svg>
+  </a>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

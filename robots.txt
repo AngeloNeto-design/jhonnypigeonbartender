@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://DOMINIO-A-DEFINIR/sitemap.xml
+Sitemap: https://jhonnypigeonbartender.vercel.app/sitemap.xml

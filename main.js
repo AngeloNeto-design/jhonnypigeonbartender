@@ -1,9 +1,13 @@
-// main.js
+// main.js · Jhonny Pigeon (build de teste scroll-craft)
+// Porta a lógica do site atual (calculadora em 3 passos -> WhatsApp) e acrescenta
+// a assinatura: "A etiqueta se escreve", uma etiqueta ao vivo no simulador.
 import { calculateEventEstimate, generateWhatsAppLink } from './calculator.js';
+import { PRICING_RULES } from './pricingConfig.js';
 
 const WHATSAPP_NUMBER = '5571996467164';
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* ---------- WhatsApp sempre acessível (flutuante, hero, footer) ---------- */
+/* ---------- WhatsApp sempre acessível (flutuante, hero, rodapé) ---------- */
 const genericMsg = encodeURIComponent(
   'Olá, Jhonny! Vi seu trabalho e quero saber mais sobre coquetelaria para o meu evento.'
 );
@@ -13,10 +17,38 @@ const genericLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${genericMsg}`;
   if (el) el.href = genericLink;
 });
 
-/* ---------- Ano do footer ---------- */
 document.getElementById('year').textContent = new Date().getFullYear();
 
-/* ---------- Calculadora em passos ---------- */
+/* ---------- WhatsApp flutuante: aparece depois da abertura ---------- */
+const floatWa = document.getElementById('float-whatsapp');
+function syncFloat() {
+  floatWa.classList.toggle('is-on', window.scrollY > window.innerHeight * 0.45);
+}
+window.addEventListener('scroll', syncFloat, { passive: true });
+syncFloat();
+
+/* ---------- Scroll suave dos links internos ---------- */
+document.querySelectorAll('[data-scroll]').forEach((a) => {
+  a.addEventListener('click', (e) => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
+  });
+});
+
+/* ---------- Contador: o motor escreve "3,500"; em português é "3.500" ---------- */
+const countEl = document.getElementById('valor-minimo');
+if (countEl) {
+  const fix = () => {
+    const t = countEl.textContent;
+    if (/,/.test(t)) countEl.textContent = t.replace(/,/g, '.');
+  };
+  new MutationObserver(fix).observe(countEl, { childList: true, characterData: true, subtree: true });
+  fix();
+}
+
+/* ---------- Simulador em passos ---------- */
 const form = document.getElementById('calc-form');
 const panels = [...form.querySelectorAll('.calc__panel')];
 const dots = [...form.querySelectorAll('.calc__step-dot')];
@@ -49,17 +81,70 @@ function readForm() {
   };
 }
 
-function goToStep(n) {
-  panels.forEach((p) => p.classList.toggle('is-active', p.dataset.step === String(n)));
-  dots.forEach((d) => {
-    const num = Number(d.dataset.dot);
-    d.classList.toggle('is-active', num === n);
-    d.classList.toggle('is-done', num < n);
-  });
-  if (n === 3) renderEstimate();
-  form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+/* ---------- A etiqueta se escreve ---------- */
+const rotulo = {};
+document.querySelectorAll('[data-rotulo]').forEach((dd) => { rotulo[dd.dataset.rotulo] = dd; });
+const typing = new Map(); // dd -> timer
+
+function escrever(key, texto, vazio = false) {
+  const dd = rotulo[key];
+  if (!dd) return;
+  if (dd.dataset.alvo === texto && dd.classList.contains('is-vazio') === vazio) return;
+  dd.dataset.alvo = texto;
+  dd.classList.toggle('is-vazio', vazio);
+  clearInterval(typing.get(dd));
+  if (reduced || texto.length === 0) {
+    dd.textContent = texto;
+    dd.classList.remove('is-escrevendo');
+    return;
+  }
+  let i = 0;
+  dd.textContent = '';
+  dd.classList.add('is-escrevendo');
+  const timer = setInterval(() => {
+    i += 1;
+    dd.textContent = texto.slice(0, i);
+    if (i >= texto.length) {
+      clearInterval(timer);
+      dd.classList.remove('is-escrevendo');
+    }
+  }, 22);
+  typing.set(dd, timer);
 }
 
+let faixaVisivel = false;
+
+function syncRotulo() {
+  const d = readForm();
+  const g = Math.floor(Number(d.guests) || 0);
+  const h = Number(d.durationHours) || PRICING_RULES.STANDARD_HOURS;
+
+  escrever('formato', d.eventType);
+  g > 0 ? escrever('convidados', `${g} pessoas`) : escrever('convidados', 'a definir', true);
+  escrever('duracao', `${h}h`);
+  escrever(
+    'carta',
+    d.isFullService
+      ? PRICING_RULES.PACKAGE_LABELS[d.packageType] || d.packageType
+      : 'Equipe + insumos'
+  );
+
+  const r = g > 0 ? calculateEventEstimate(d) : { error: true };
+  if (!r.error) {
+    escrever('equipe', `${r.bartendersNeeded} ${r.bartendersNeeded > 1 ? 'bartenders' : 'bartender'}`);
+  } else {
+    escrever('equipe', 'a definir', true);
+  }
+
+  if (faixaVisivel && !r.error) {
+    const fmt = (v) => `R$ ${v.toLocaleString('pt-BR')}`;
+    escrever('faixa', `${fmt(r.minEstimate)} a ${fmt(r.maxEstimate)}`);
+  } else {
+    escrever('faixa', 'no último passo', true);
+  }
+}
+
+/* ---------- Passos ---------- */
 function renderEstimate() {
   const data = readForm();
   const result = calculateEventEstimate(data);
@@ -74,7 +159,22 @@ function renderEstimate() {
   estimateMeta.textContent = `${data.guests} convidados · ${data.durationHours}h · equipe de ${result.bartendersNeeded} ${plural}`;
 }
 
-/* Navegação entre passos */
+function goToStep(n) {
+  panels.forEach((p) => p.classList.toggle('is-active', p.dataset.step === String(n)));
+  dots.forEach((d) => {
+    const num = Number(d.dataset.dot);
+    d.classList.toggle('is-active', num === n);
+    d.classList.toggle('is-done', num < n);
+    if (num === n) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
+  });
+  faixaVisivel = n === 3;
+  if (n === 3) renderEstimate();
+  syncRotulo();
+  form.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+  const first = panels.find((p) => p.dataset.step === String(n))?.querySelector('input, select, button');
+  if (first) first.focus({ preventScroll: true });
+}
+
 form.addEventListener('click', (e) => {
   const next = e.target.closest('[data-next]');
   const back = e.target.closest('[data-back]');
@@ -84,6 +184,7 @@ form.addEventListener('click', (e) => {
       const g = Math.floor(Number(guestsInput.value) || 0);
       const invalid = g <= 0;
       errGuests.hidden = !invalid;
+      guestsInput.setAttribute('aria-invalid', String(invalid));
       if (invalid) {
         guestsInput.focus();
         return;
@@ -98,22 +199,40 @@ form.addEventListener('click', (e) => {
 form.querySelectorAll('input[name="service-model"]').forEach((radio) => {
   radio.addEventListener('change', () => {
     packageGroup.classList.toggle('is-hidden', radio.value !== 'full' || !radio.checked);
+    syncRotulo();
   });
 });
 
-/* Estimativa reativa enquanto o passo 3 está aberto */
-[guestsInput, durationInput, mobileBarInput].forEach((el) => {
-  el.addEventListener('input', () => {
-    if (panels[2].classList.contains('is-active')) renderEstimate();
+/* A etiqueta e a estimativa acompanham cada campo */
+form.addEventListener('input', () => {
+  if (panels[2].classList.contains('is-active')) renderEstimate();
+  if (!errGuests.hidden && Math.floor(Number(guestsInput.value) || 0) > 0) {
+    errGuests.hidden = true;
+    guestsInput.setAttribute('aria-invalid', 'false');
+  }
+  syncRotulo();
+});
+form.addEventListener('change', syncRotulo);
+
+/* Cartas: "Escolher esta carta" marca a opção e leva ao simulador */
+document.querySelectorAll('[data-pick]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const radio = form.querySelector(`input[name="package"][value="${btn.dataset.pick}"]`);
+    const full = form.querySelector('input[name="service-model"][value="full"]');
+    if (full) { full.checked = true; packageGroup.classList.remove('is-hidden'); }
+    if (radio) radio.checked = true;
+    syncRotulo();
+    document.getElementById('simular').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
   });
 });
 
-/* Envio → WhatsApp com mensagem formatada */
+/* ---------- Envio -> WhatsApp com a mesma mensagem do site atual ---------- */
 form.addEventListener('submit', (e) => {
   e.preventDefault();
   const name = nameInput.value.trim();
   const invalidName = name.length < 2;
   errName.hidden = !invalidName;
+  nameInput.setAttribute('aria-invalid', String(invalidName));
   if (invalidName) {
     nameInput.focus();
     return;
@@ -124,6 +243,7 @@ form.addEventListener('submit', (e) => {
   if (result.error) {
     goToStep(1);
     errGuests.hidden = false;
+    guestsInput.setAttribute('aria-invalid', 'true');
     return;
   }
 
@@ -145,13 +265,8 @@ form.addEventListener('submit', (e) => {
     },
     result
   );
-  window.open(link, '_blank', 'noopener');
+  window.open(link, '_blank', 'noopener,noreferrer');
 });
 
-/* ---------- Scroll suave do CTA do hero ---------- */
-document.querySelectorAll('[data-scroll]').forEach((a) => {
-  a.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
-  });
-});
+/* Estado inicial da etiqueta */
+syncRotulo();

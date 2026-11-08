@@ -37,7 +37,7 @@ document.querySelectorAll('[data-scroll]').forEach((a) => {
   });
 });
 
-/* ---------- Contador: o motor escreve "3,500"; em português é "3.500" ---------- */
+/* ---------- Contador: se o motor escrever milhar com vírgula, vira ponto (pt-BR) ---------- */
 const countEl = document.getElementById('valor-minimo');
 if (countEl) {
   const fix = () => {
@@ -156,7 +156,10 @@ function renderEstimate() {
   const fmt = (v) => `R$ ${v.toLocaleString('pt-BR')}`;
   estimateValue.textContent = `${fmt(result.minEstimate)} – ${fmt(result.maxEstimate)}`;
   const plural = result.bartendersNeeded > 1 ? 'bartenders' : 'bartender';
-  estimateMeta.textContent = `${data.guests} convidados · ${data.durationHours}h · equipe de ${result.bartendersNeeded} ${plural}`;
+  const rate = fmt(PRICING_RULES.HOURLY_RATE);
+  estimateMeta.textContent =
+    `${Math.floor(Number(data.guests))} convidados · equipe: ${result.bartendersNeeded} ${plural} × ${result.hours}h × ${rate}/h = ${fmt(result.laborCost)}` +
+    ` · bebidas, insumos${result.structureCost ? ' e bar móvel' : ''}: ${fmt(result.suppliesCost + result.structureCost)}`;
 }
 
 function goToStep(n) {

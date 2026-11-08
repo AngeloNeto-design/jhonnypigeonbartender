@@ -133,7 +133,7 @@
           <h3 class="servico__nome">Eventos privados</h3>
           <dl class="etiqueta">
             <div><dt>Para quem</dt><dd>Aniversários, festas em casa de temporada, encontros</dd></div>
-            <div><dt>O que entra</dt><dd>Equipe, insumos e técnica. Bebidas incluídas ou por sua conta</dd></div>
+            <div><dt>O que entra</dt><dd>Equipe e técnica. Bebidas e insumos por sua conta ou cotados pelo Jhonny</dd></div>
             <div><dt>Onde</dt><dd>Onde a festa estiver, na península</dd></div>
           </dl>
         </li>
@@ -186,7 +186,7 @@
         </article>
 
         <div class="rail__end sc-stack">
-          <p class="sc-lede">Na dúvida, o simulador mostra a faixa de cada carta para o seu evento.</p>
+          <p class="sc-lede">No simulador você escolhe a carta e marca as bebidas que quer no evento.</p>
           <a class="btn" href="#simular" data-scroll>Simular meu evento</a>
         </div>
       </div>
@@ -218,7 +218,7 @@
           <span class="sr-only">R$ 250 por hora</span>
           <span aria-hidden="true">R$ <span id="valor-minimo">250</span><small>/h</small></span>
         </p>
-        <p class="valores__nota" data-sc-cue="0.3 0.96">Por hora, por bartender. Bebidas, insumos e logística entram na simulação. Agenda limitada por temporada.</p>
+        <p class="valores__nota" data-sc-cue="0.3 0.96">Por hora, por bartender. Bebidas e insumos ficam por sua conta ou o Jhonny cota a partir da sua lista. Agenda limitada por temporada.</p>
         <a class="btn" href="#simular" data-scroll data-sc-cue="0.3 0.96">Simular meu evento</a>
       </div>
     </div>
@@ -242,7 +242,9 @@
             <div><dt>Duração</dt><dd data-rotulo="duracao">4h</dd></div>
             <div><dt>Carta</dt><dd data-rotulo="carta">Gin Bar &amp; Internacionais</dd></div>
             <div><dt>Equipe</dt><dd data-rotulo="equipe" class="is-vazio">a definir</dd></div>
-            <div><dt>Faixa</dt><dd data-rotulo="faixa" class="is-vazio">no último passo</dd></div>
+            <div><dt>Bebidas</dt><dd data-rotulo="bebidas">Por sua conta</dd></div>
+            <div><dt>Insumos</dt><dd data-rotulo="insumos">Por sua conta</dd></div>
+            <div><dt>Valor fechado</dt><dd data-rotulo="valor" class="is-vazio">no último passo</dd></div>
           </dl>
         </aside>
 
@@ -250,7 +252,7 @@
           <ol class="calc__steps">
             <li class="calc__step-dot is-active" data-dot="1">O evento</li>
             <li class="calc__step-dot" data-dot="2">O serviço</li>
-            <li class="calc__step-dot" data-dot="3">A faixa</li>
+            <li class="calc__step-dot" data-dot="3">O valor</li>
           </ol>
 
           <fieldset class="calc__panel is-active" data-step="1">
@@ -282,41 +284,89 @@
 
           <fieldset class="calc__panel" data-step="2">
             <legend class="calc__legend">O serviço</legend>
-            <div class="opcoes">
-              <label class="opcao">
-                <input type="radio" name="service-model" value="full" checked>
-                <span class="opcao__corpo">
-                  <span class="opcao__titulo">Serviço completo</span>
-                  <span class="opcao__texto">Equipe, bar, insumos e bebidas inclusas. Você não se preocupa com nada.</span>
-                </span>
-              </label>
-              <label class="opcao">
-                <input type="radio" name="service-model" value="labor">
-                <span class="opcao__corpo">
-                  <span class="opcao__titulo">Equipe + insumos</span>
-                  <span class="opcao__texto">Você fornece as bebidas; eu levo equipe, técnica e insumos.</span>
-                </span>
-              </label>
-            </div>
 
-            <div class="opcoes" id="package-group">
-              <label class="opcao">
-                <input type="radio" name="package" value="CLASSIC">
-                <span class="opcao__corpo"><span class="opcao__titulo">Clássicos Autorais</span></span>
-              </label>
-              <label class="opcao">
-                <input type="radio" name="package" value="PREMIUM" checked>
-                <span class="opcao__corpo"><span class="opcao__titulo">Gin Bar &amp; Internacionais</span></span>
-              </label>
-              <label class="opcao">
-                <input type="radio" name="package" value="HIGH_END">
-                <span class="opcao__corpo"><span class="opcao__titulo">Coquetelaria de Autor</span></span>
-              </label>
-            </div>
+            <fieldset class="grupo">
+              <legend class="grupo__titulo">Bebidas</legend>
+              <div class="opcoes">
+                <label class="opcao">
+                  <input type="radio" name="drinks-by" value="host" checked>
+                  <span class="opcao__corpo">
+                    <span class="opcao__titulo">Por minha conta</span>
+                    <span class="opcao__texto">Você compra as bebidas. O Jhonny cuida dos drinks.</span>
+                  </span>
+                </label>
+                <label class="opcao">
+                  <input type="radio" name="drinks-by" value="jhonny">
+                  <span class="opcao__corpo">
+                    <span class="opcao__titulo">Quero que o Jhonny ofereça</span>
+                    <span class="opcao__texto">Marque abaixo as bebidas que quer. O Jhonny manda a lista e a cotação.</span>
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="grupo">
+              <legend class="grupo__titulo" id="lista-titulo">Quais bebidas vão ter no evento?</legend>
+              <p class="field__hint" id="lista-hint">Opcional. Ajuda o Jhonny a planejar os drinks.</p>
+              <div class="bebidas" id="drinks-list">
+                <label class="check"><input type="checkbox" name="drink-item" value="Gin"><span>Gin</span></label>
+                <label class="check"><input type="checkbox" name="drink-item" value="Vodka"><span>Vodka</span></label>
+                <label class="check"><input type="checkbox" name="drink-item" value="Cachaça"><span>Cachaça</span></label>
+                <label class="check"><input type="checkbox" name="drink-item" value="Rum"><span>Rum</span></label>
+                <label class="check"><input type="checkbox" name="drink-item" value="Whisky"><span>Whisky</span></label>
+                <label class="check"><input type="checkbox" name="drink-item" value="Tequila"><span>Tequila</span></label>
+                <label class="check"><input type="checkbox" name="drink-item" value="Espumante"><span>Espumante</span></label>
+                <label class="check"><input type="checkbox" name="drink-item" value="Vinho"><span>Vinho</span></label>
+                <label class="check"><input type="checkbox" name="drink-item" value="Cerveja"><span>Cerveja</span></label>
+                <label class="check"><input type="checkbox" name="drink-item" value="Drinks sem álcool"><span>Drinks sem álcool</span></label>
+              </div>
+              <div class="field">
+                <label for="f-drinks-other">Outras bebidas ou marcas preferidas</label>
+                <input id="f-drinks-other" name="drinksOther" type="text" maxlength="200" placeholder="Ex.: gin Tanqueray, saquê" autocomplete="off">
+              </div>
+              <p class="field__err" id="err-drinks" role="alert" hidden>Marque pelo menos uma bebida para o Jhonny fazer a cotação.</p>
+            </fieldset>
+
+            <fieldset class="grupo">
+              <legend class="grupo__titulo">Insumos <span class="grupo__desc">(gelo, limão, frutas da estação etc.)</span></legend>
+              <div class="opcoes">
+                <label class="opcao">
+                  <input type="radio" name="supplies-by" value="host" checked>
+                  <span class="opcao__corpo">
+                    <span class="opcao__titulo">Por minha conta</span>
+                  </span>
+                </label>
+                <label class="opcao">
+                  <input type="radio" name="supplies-by" value="jhonny">
+                  <span class="opcao__corpo">
+                    <span class="opcao__titulo">Quero que o Jhonny ofereça</span>
+                    <span class="opcao__texto">Entra na cotação. São itens da estação, o preço depende da época e da logística.</span>
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="grupo">
+              <legend class="grupo__titulo">Estilo da carta</legend>
+              <div class="opcoes" id="package-group">
+                <label class="opcao">
+                  <input type="radio" name="package" value="CLASSIC">
+                  <span class="opcao__corpo"><span class="opcao__titulo">Clássicos Autorais</span></span>
+                </label>
+                <label class="opcao">
+                  <input type="radio" name="package" value="PREMIUM" checked>
+                  <span class="opcao__corpo"><span class="opcao__titulo">Gin Bar &amp; Internacionais</span></span>
+                </label>
+                <label class="opcao">
+                  <input type="radio" name="package" value="HIGH_END">
+                  <span class="opcao__corpo"><span class="opcao__titulo">Coquetelaria de Autor</span></span>
+                </label>
+              </div>
+            </fieldset>
 
             <label class="check">
               <input type="checkbox" id="f-mobile-bar" name="mobileBar">
-              <span>Estrutura de bar móvel + logística da península</span>
+              <span>Estrutura de bar móvel + logística da península (R$ 800)</span>
             </label>
 
             <div class="calc__nav">
@@ -326,11 +376,20 @@
           </fieldset>
 
           <fieldset class="calc__panel" data-step="3">
-            <legend class="calc__legend">A sua faixa</legend>
+            <legend class="calc__legend">O valor do seu evento</legend>
             <div class="estimativa" id="estimate-box" aria-live="polite">
-              <p class="estimativa__valor" id="estimate-value">R$ 0</p>
+              <ul class="estimativa__itens" id="estimate-items"></ul>
+              <div class="estimativa__total">
+                <span id="estimate-total-label">Total fechado</span>
+                <p class="estimativa__valor" id="estimate-value">R$ 0</p>
+              </div>
               <p class="estimativa__meta" id="estimate-meta"></p>
             </div>
+            <ol class="passos-fechamento">
+              <li>Você envia esta simulação pelo WhatsApp.</li>
+              <li id="passo-cotacao">O Jhonny confirma a data.</li>
+              <li>Tudo combinado em contrato, e a data fica reservada.</li>
+            </ol>
             <div class="field">
               <label for="f-name">Seu nome</label>
               <input id="f-name" name="name" type="text" autocomplete="name" aria-describedby="err-name">

@@ -1,7 +1,8 @@
-// main.js · Jhonny Pigeon (build de teste scroll-craft)
-// Porta a lógica do site atual (calculadora em 3 passos -> WhatsApp) e acrescenta
-// a assinatura: "A etiqueta se escreve", uma etiqueta ao vivo no simulador.
-import { calculateEventEstimate, generateWhatsAppLink } from './calculator.js';
+// main.js · Jhonny Pigeon
+// Simulador em 3 passos -> WhatsApp, com a etiqueta "A sua festa" se escrevendo ao vivo.
+// Valor fechado: só equipe (R$ 250/h por bartender) e bar móvel. Bebidas e insumos
+// ficam por conta do contratante ou entram na cotação do Jhonny, sem preço no site.
+import { calculateEventEstimate, generateWhatsAppLink, brl } from './calculator.js';
 import { PRICING_RULES } from './pricingConfig.js';
 
 const WHATSAPP_NUMBER = '5571996467164';
@@ -37,17 +38,6 @@ document.querySelectorAll('[data-scroll]').forEach((a) => {
   });
 });
 
-/* ---------- Contador: se o motor escrever milhar com vírgula, vira ponto (pt-BR) ---------- */
-const countEl = document.getElementById('valor-minimo');
-if (countEl) {
-  const fix = () => {
-    const t = countEl.textContent;
-    if (/,/.test(t)) countEl.textContent = t.replace(/,/g, '.');
-  };
-  new MutationObserver(fix).observe(countEl, { childList: true, characterData: true, subtree: true });
-  fix();
-}
-
 /* ---------- Simulador em passos ---------- */
 const form = document.getElementById('calc-form');
 const panels = [...form.querySelectorAll('.calc__panel')];
@@ -57,28 +47,47 @@ const guestsInput = document.getElementById('f-guests');
 const durationInput = document.getElementById('f-duration');
 const eventTypeInput = document.getElementById('f-event-type');
 const mobileBarInput = document.getElementById('f-mobile-bar');
+const drinksOtherInput = document.getElementById('f-drinks-other');
 const nameInput = document.getElementById('f-name');
 const dateInput = document.getElementById('f-date');
-const packageGroup = document.getElementById('package-group');
 const errGuests = document.getElementById('err-guests');
+const errDrinks = document.getElementById('err-drinks');
 const errName = document.getElementById('err-name');
+const listaTitulo = document.getElementById('lista-titulo');
+const listaHint = document.getElementById('lista-hint');
 const estimateValue = document.getElementById('estimate-value');
 const estimateMeta = document.getElementById('estimate-meta');
+const estimateItems = document.getElementById('estimate-items');
+const passoCotacao = document.getElementById('passo-cotacao');
+
+function checked(name) {
+  return form.querySelector(`input[name="${name}"]:checked`)?.value;
+}
 
 function readForm() {
-  const isFullService =
-    form.querySelector('input[name="service-model"]:checked').value === 'full';
-  const packageType = isFullService
-    ? form.querySelector('input[name="package"]:checked').value
-    : 'Equipe + insumos (bebidas por conta do anfitrião)';
   return {
     guests: guestsInput.value,
     durationHours: durationInput.value,
     eventType: eventTypeInput.value,
-    isFullService,
-    packageType,
+    drinksBy: checked('drinks-by') || 'host',
+    suppliesBy: checked('supplies-by') || 'host',
+    packageType: checked('package') || 'PREMIUM',
+    drinksList: [...form.querySelectorAll('input[name="drink-item"]:checked')].map((c) => c.value),
+    drinksOther: drinksOtherInput.value.trim(),
     needsMobileBar: mobileBarInput.checked
   };
+}
+
+/* A lista de bebidas muda de sentido conforme quem fornece */
+function syncListaBebidas() {
+  const jhonny = checked('drinks-by') === 'jhonny';
+  listaTitulo.textContent = jhonny
+    ? 'Quais bebidas você quer que o Jhonny ofereça?'
+    : 'Quais bebidas vão ter no evento?';
+  listaHint.textContent = jhonny
+    ? 'Marque pelo menos uma. É com essa lista que o Jhonny faz a cotação.'
+    : 'Opcional. Ajuda o Jhonny a planejar os drinks.';
+  if (!jhonny) errDrinks.hidden = true;
 }
 
 /* ---------- A etiqueta se escreve ---------- */
@@ -112,22 +121,17 @@ function escrever(key, texto, vazio = false) {
   typing.set(dd, timer);
 }
 
-let faixaVisivel = false;
+let valorVisivel = false;
 
 function syncRotulo() {
   const d = readForm();
   const g = Math.floor(Number(d.guests) || 0);
-  const h = Number(d.durationHours) || PRICING_RULES.STANDARD_HOURS;
+  const h = Math.floor(Number(d.durationHours) || PRICING_RULES.STANDARD_HOURS);
 
   escrever('formato', d.eventType);
   g > 0 ? escrever('convidados', `${g} pessoas`) : escrever('convidados', 'a definir', true);
   escrever('duracao', `${h}h`);
-  escrever(
-    'carta',
-    d.isFullService
-      ? PRICING_RULES.PACKAGE_LABELS[d.packageType] || d.packageType
-      : 'Equipe + insumos'
-  );
+  escrever('carta', PRICING_RULES.PACKAGE_LABELS[d.packageType] || d.packageType);
 
   const r = g > 0 ? calculateEventEstimate(d) : { error: true };
   if (!r.error) {
@@ -136,30 +140,67 @@ function syncRotulo() {
     escrever('equipe', 'a definir', true);
   }
 
-  if (faixaVisivel && !r.error) {
-    const fmt = (v) => `R$ ${v.toLocaleString('pt-BR')}`;
-    escrever('faixa', `${fmt(r.minEstimate)} a ${fmt(r.maxEstimate)}`);
+  escrever('bebidas', d.drinksBy === 'jhonny' ? 'Cotação do Jhonny' : 'Por sua conta');
+  escrever('insumos', d.suppliesBy === 'jhonny' ? 'Cotação do Jhonny' : 'Por sua conta');
+
+  if (valorVisivel && !r.error) {
+    escrever('valor', brl(r.total));
   } else {
-    escrever('faixa', 'no último passo', true);
+    escrever('valor', 'no último passo', true);
   }
 }
 
-/* ---------- Passos ---------- */
+/* ---------- Passo 3: valor fechado, item por item ---------- */
 function renderEstimate() {
-  const data = readForm();
-  const result = calculateEventEstimate(data);
+  const result = calculateEventEstimate(readForm());
+  estimateItems.replaceChildren();
   if (result.error) {
     estimateValue.textContent = '—';
     estimateMeta.textContent = result.error;
     return;
   }
-  const fmt = (v) => `R$ ${v.toLocaleString('pt-BR')}`;
-  estimateValue.textContent = `${fmt(result.minEstimate)} – ${fmt(result.maxEstimate)}`;
-  const plural = result.bartendersNeeded > 1 ? 'bartenders' : 'bartender';
-  const rate = fmt(PRICING_RULES.HOURLY_RATE);
-  estimateMeta.textContent =
-    `${Math.floor(Number(data.guests))} convidados · equipe: ${result.bartendersNeeded} ${plural} × ${result.hours}h × ${rate}/h = ${fmt(result.laborCost)}` +
-    ` · bebidas, insumos${result.structureCost ? ' e bar móvel' : ''}: ${fmt(result.suppliesCost + result.structureCost)}`;
+  result.items.forEach((it) => {
+    const li = document.createElement('li');
+    const txt = document.createElement('span');
+    const nome = document.createElement('strong');
+    nome.textContent = it.label;
+    const conta = document.createElement('small');
+    conta.textContent = it.detail;
+    txt.append(nome, conta);
+    const val = document.createElement('span');
+    val.className = 'estimativa__item-valor';
+    if (it.value === null) {
+      val.classList.add('is-aparte');
+      val.textContent = it.note;
+    } else {
+      val.textContent = brl(it.value);
+    }
+    li.append(txt, val);
+    estimateItems.append(li);
+  });
+  estimateValue.textContent = brl(result.total);
+
+  const base = `Este é o valor fechado da equipe${result.structureCost ? ' e do bar móvel' : ''}.`;
+  if (result.drinksByJhonny && result.suppliesByJhonny) {
+    estimateMeta.textContent = `${base} Bebidas e insumos entram na cotação que o Jhonny manda a partir da sua lista.`;
+    passoCotacao.textContent = 'O Jhonny confirma a data e manda a cotação das bebidas e dos insumos.';
+  } else if (result.drinksByJhonny) {
+    estimateMeta.textContent = `${base} As bebidas entram na cotação que o Jhonny manda a partir da sua lista. Os insumos ficam por sua conta.`;
+    passoCotacao.textContent = 'O Jhonny confirma a data e manda a cotação das bebidas.';
+  } else if (result.suppliesByJhonny) {
+    estimateMeta.textContent = `${base} Os insumos entram na cotação do Jhonny. As bebidas ficam por sua conta.`;
+    passoCotacao.textContent = 'O Jhonny confirma a data e manda a cotação dos insumos.';
+  } else {
+    estimateMeta.textContent = `${base} Bebidas e insumos ficam por sua conta.`;
+    passoCotacao.textContent = 'O Jhonny confirma a data.';
+  }
+}
+
+function validarBebidas() {
+  const d = readForm();
+  const invalid = d.drinksBy === 'jhonny' && d.drinksList.length === 0 && !d.drinksOther;
+  errDrinks.hidden = !invalid;
+  return !invalid;
 }
 
 function goToStep(n) {
@@ -170,7 +211,7 @@ function goToStep(n) {
     d.classList.toggle('is-done', num < n);
     if (num === n) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
   });
-  faixaVisivel = n === 3;
+  valorVisivel = n === 3;
   if (n === 3) renderEstimate();
   syncRotulo();
   form.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
@@ -189,47 +230,51 @@ form.addEventListener('click', (e) => {
       errGuests.hidden = !invalid;
       guestsInput.setAttribute('aria-invalid', String(invalid));
       if (invalid) {
+        goToStepIfNeeded(1);
         guestsInput.focus();
         return;
       }
+    }
+    if (target === 3 && !validarBebidas()) {
+      document.getElementById('drinks-list').querySelector('input')?.focus();
+      return;
     }
     goToStep(target);
   }
   if (back) goToStep(Number(back.dataset.back));
 });
 
-/* Pacotes só fazem sentido no serviço completo */
-form.querySelectorAll('input[name="service-model"]').forEach((radio) => {
-  radio.addEventListener('change', () => {
-    packageGroup.classList.toggle('is-hidden', radio.value !== 'full' || !radio.checked);
-    syncRotulo();
-  });
+function goToStepIfNeeded(n) {
+  if (!panels[n - 1].classList.contains('is-active')) goToStep(n);
+}
+
+form.querySelectorAll('input[name="drinks-by"]').forEach((radio) => {
+  radio.addEventListener('change', syncListaBebidas);
 });
 
-/* A etiqueta e a estimativa acompanham cada campo */
+/* A etiqueta e o valor acompanham cada campo */
 form.addEventListener('input', () => {
   if (panels[2].classList.contains('is-active')) renderEstimate();
   if (!errGuests.hidden && Math.floor(Number(guestsInput.value) || 0) > 0) {
     errGuests.hidden = true;
     guestsInput.setAttribute('aria-invalid', 'false');
   }
+  if (!errDrinks.hidden) validarBebidas();
   syncRotulo();
 });
 form.addEventListener('change', syncRotulo);
 
-/* Cartas: "Escolher esta carta" marca a opção e leva ao simulador */
+/* Cartas: "Escolher esta carta" marca o estilo e leva ao simulador */
 document.querySelectorAll('[data-pick]').forEach((btn) => {
   btn.addEventListener('click', () => {
     const radio = form.querySelector(`input[name="package"][value="${btn.dataset.pick}"]`);
-    const full = form.querySelector('input[name="service-model"][value="full"]');
-    if (full) { full.checked = true; packageGroup.classList.remove('is-hidden'); }
     if (radio) radio.checked = true;
     syncRotulo();
     document.getElementById('simular').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
   });
 });
 
-/* ---------- Envio -> WhatsApp com a mesma mensagem do site atual ---------- */
+/* ---------- Envio -> WhatsApp com a simulação completa ---------- */
 form.addEventListener('submit', (e) => {
   e.preventDefault();
   const name = nameInput.value.trim();
@@ -249,6 +294,11 @@ form.addEventListener('submit', (e) => {
     guestsInput.setAttribute('aria-invalid', 'true');
     return;
   }
+  if (!validarBebidas()) {
+    goToStep(2);
+    errDrinks.hidden = false;
+    return;
+  }
 
   let eventDate = 'A definir';
   if (dateInput.value) {
@@ -262,14 +312,17 @@ form.addEventListener('submit', (e) => {
       name,
       eventDate,
       eventType: data.eventType,
-      guests: Math.floor(Number(data.guests)),
-      durationHours: data.durationHours,
-      packageType: data.packageType
+      guests: result.guests,
+      durationHours: result.hours,
+      packageType: data.packageType,
+      drinksList: data.drinksList,
+      drinksOther: data.drinksOther
     },
     result
   );
   window.open(link, '_blank', 'noopener,noreferrer');
 });
 
-/* Estado inicial da etiqueta */
+/* Estado inicial (o navegador pode lembrar marcações ao recarregar) */
+syncListaBebidas();
 syncRotulo();

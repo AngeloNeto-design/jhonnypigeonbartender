@@ -371,10 +371,26 @@ body { background: var(--sc-canvas); color: var(--sc-ink); }
 .check input { margin-top: .15rem; width: 1.2rem; height: 1.2rem; accent-color: var(--sc-accent); flex: none; }
 .check:has(input:focus-visible) { outline: 2px solid var(--sc-accent); outline-offset: 2px; border-radius: 4px; }
 
-/* Faixa estimada */
-.estimativa { padding: 1.25rem 0; border-block: 1px solid var(--sc-hairline-strong); }
-.estimativa__valor { margin: 0; font: 600 clamp(1.9rem, 4vw, 3rem)/1.1 var(--sc-font-display); color: var(--sc-accent); }
-.estimativa__meta { margin: .5rem 0 0; color: var(--sc-ink-soft); }
+/* Grupos do passo 2 */
+.grupo { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: .65rem; }
+.grupo__titulo { padding: 0; margin-bottom: .1rem; font-weight: 600; font-size: 1.0625rem; color: var(--sc-ink); }
+.grupo__desc { font-weight: 400; color: var(--sc-ink-soft); font-size: .9375rem; }
+.bebidas { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: 0 1rem; }
+.bebidas .check { min-height: 44px; padding: .35rem 0; }
+
+/* Valor fechado, item por item */
+.estimativa { padding: 1.25rem 0; border-block: 1px solid var(--sc-hairline-strong); display: grid; gap: 1rem; }
+.estimativa__itens { list-style: none; margin: 0; padding: 0; display: grid; }
+.estimativa__itens li { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: .7rem 0; border-bottom: 1px dotted var(--sc-hairline-strong); }
+.estimativa__itens li > span:first-child { display: grid; gap: .15rem; min-width: 0; }
+.estimativa__itens small { color: var(--sc-ink-soft); font-size: .875rem; }
+.estimativa__item-valor { flex: none; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+.estimativa__item-valor.is-aparte { font-weight: 500; color: var(--folha); font-size: .9375rem; }
+.estimativa__total { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+.estimativa__total > span { font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: .875rem; color: var(--sc-ink-soft); }
+.estimativa__valor { margin: 0; font: 600 clamp(1.9rem, 4vw, 3rem)/1.1 var(--sc-font-display); color: var(--sc-accent); font-variant-numeric: tabular-nums; }
+.estimativa__meta { margin: 0; color: var(--sc-ink-soft); }
+.passos-fechamento { margin: 0; padding-left: 1.25rem; display: grid; gap: .35rem; color: var(--sc-ink-soft); font-size: .9375rem; }
 
 /* ---------- Rodapé ---------- */
 .rodape { margin-top: clamp(4rem, 10vw, 8rem); padding-top: clamp(2rem, 5vw, 3.5rem); border-top: 1px solid var(--sc-hairline-strong);
